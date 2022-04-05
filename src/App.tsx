@@ -6,6 +6,7 @@ type DataTypes = {
 };
 
 const App = (): JSX.Element => {
+    const [isTopButton, setIsTopButton] = useState<boolean>(false);
     const [datas, setData] = useState<DataTypes[]>([
         { name: "기린", id: 0 },
         { name: "강아지", id: 1 },
@@ -21,6 +22,12 @@ const App = (): JSX.Element => {
     // useEffect
     useEffect(() => {
         getInfo();
+
+        window.addEventListener("scroll", handleScrollThrottle);
+
+        return () => {
+            window.removeEventListener("scroll", handleScrollThrottle);
+        };
     }, []);
 
     useEffect(() => {
@@ -56,21 +63,54 @@ const App = (): JSX.Element => {
         });
     };
 
-    return (
-        <div className="wrapper">
-            {datas.map((animal, index) => {
-                return (
-                    <div key={index} className={`card`}>
-                        <p>아이디: {animal.id}</p>
-                        <p>이름:{animal.name}</p>
-                    </div>
-                );
-            })}
+    const topScroll = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
-            <div ref={target} style={{ height: "150px" }}>
-                <div style={{ height: "150px" }}>로딩중....</div>
+    const handleScrollThrottle = (e: any) => {
+        console.log(window.scrollY);
+        if (window.scrollY > 200) {
+            setIsTopButton(true);
+        } else {
+            setIsTopButton(false);
+        }
+    };
+
+    return (
+        <>
+            <div className="wrapper">
+                {datas.map((animal, index) => {
+                    return (
+                        <div key={index} className={`card`}>
+                            <p>아이디: {animal.id}</p>
+                            <p>이름:{animal.name}</p>
+                        </div>
+                    );
+                })}
+
+                <div ref={target} style={{ height: "150px" }}>
+                    <div style={{ height: "150px" }}>로딩중....</div>
+                </div>
             </div>
-        </div>
+            {isTopButton && (
+                <button
+                    style={{
+                        position: "fixed",
+                        bottom: "40px",
+                        right: "40px",
+                        width: "70px",
+                        height: "70px",
+                        borderRadius: "35px",
+                        border: "none",
+                        background: "#23fa5c",
+                        color: "white",
+                    }}
+                    onClick={topScroll}
+                >
+                    ▲
+                </button>
+            )}
+        </>
     );
 };
 
